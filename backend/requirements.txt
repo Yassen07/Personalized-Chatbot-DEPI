@@ -1,0 +1,18 @@
+fastapi
+uvicorn
+
+# LangChain
+langchain
+langchain-core
+langchain-community
+
+# Pydantic (works with llama-cpp & langchain)
+pydantic==2.7.1
+
+# LLaMA backend
+llama-cpp-python
+
+# Vector store & embeddings
+chromadb
+sentence-transformers
+pandas

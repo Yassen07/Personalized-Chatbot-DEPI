@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MS Support Chatbot</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+
+    #chatbox {
+      width: 100%;
+      max-width: 500px;
+      background: white;
+      border-radius: 20px;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      height: 600px;
+    }
+
+    .chat-header {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      padding: 25px;
+      text-align: center;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    }
+
+    .chat-header h2 {
+      font-size: 24px;
+      font-weight: 600;
+      margin-bottom: 5px;
+    }
+
+    .chat-header p {
+      font-size: 14px;
+      opacity: 0.9;
+    }
+
+    #messages {
+      flex: 1;
+      padding: 20px;
+      overflow-y: auto;
+      background: #f8f9fa;
+      scroll-behavior: smooth;
+    }
+
+    #messages::-webkit-scrollbar {
+      width: 8px;
+    }
+    #messages::-webkit-scrollbar-track {
+      background: #f1f1f1;
+    }
+    #messages::-webkit-scrollbar-thumb {
+      background: #667eea;
+      border-radius: 4px;
+    }
+
+    .msg-user {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      padding: 12px 16px;
+      margin: 10px 0;
+      border-radius: 18px 18px 4px 18px;
+      max-width: 75%;
+      margin-left: auto;
+      word-wrap: break-word;
+      box-shadow: 0 2px 8px rgba(102, 126, 234, 0.3);
+      animation: slideInRight 0.3s ease;
+    }
+
+    .msg-bot {
+      background: white;
+      color: #333;
+      padding: 12px 16px;
+      margin: 10px 0;
+      border-radius: 18px 18px 18px 4px;
+      max-width: 75%;
+      margin-right: auto;
+      word-wrap: break-word;
+      white-space: pre-wrap; /* 🔥 preserve newlines */
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+      border: 1px solid #e0e0e0;
+      animation: slideInLeft 0.3s ease;
+    }
+
+    @keyframes slideInRight {
+      from { opacity: 0; transform: translateX(20px); }
+      to { opacity: 1; transform: translateX(0); }
+    }
+
+    @keyframes slideInLeft {
+      from { opacity: 0; transform: translateX(-20px); }
+      to { opacity: 1; transform: translateX(0); }
+    }
+
+    .input-area {
+      padding: 20px;
+      background: white;
+      border-top: 1px solid #e0e0e0;
+      display: flex;
+      gap: 10px;
+    }
+
+    #input {
+      flex: 1;
+      padding: 12px 16px;
+      border: 2px solid #e0e0e0;
+      border-radius: 25px;
+      font-size: 15px;
+      outline: none;
+      transition: all 0.3s ease;
+    }
+
+    #input:focus {
+      border-color: #667eea;
+      box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+    }
+
+    #send {
+      padding: 12px 28px;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      border: none;
+      border-radius: 25px;
+      font-size: 15px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+    }
+
+    .typing-indicator {
+      display: none;
+      padding: 12px 16px;
+      margin: 10px 0;
+      background: white;
+      border-radius: 18px 18px 18px 4px;
+      max-width: 75px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+      border: 1px solid #e0e0e0;
+    }
+
+    .typing-indicator span {
+      display: inline-block;
+      width: 8px;
+      height: 8px;
+      background: #667eea;
+      border-radius: 50%;
+      margin: 0 2px;
+      animation: typing 1.4s infinite;
+    }
+
+    @keyframes typing {
+      0%, 60%, 100% { transform: translateY(0); }
+      30% { transform: translateY(-10px); }
+    }
+  </style>
+</head>
+<body>
+
+<div id="chatbox">
+  <div class="chat-header">
+    <h2>MS Support Chatbot</h2>
+    <p>How can we help you today?</p>
+  </div>
+
+  <div id="messages">
+    <div class="msg-bot">Hello! I'm here to assist you with any questions you have. How can I help you today?</div>
+
+    <div class="typing-indicator" id="typing">
+      <span></span><span></span><span></span>
+    </div>
+  </div>
+
+  <div class="input-area">
+    <input id="input" placeholder="Type your message..." />
+    <button id="send">Send</button>
+  </div>
+</div>
+
+<script>
+  const sendBtn = document.getElementById("send");
+  const input = document.getElementById("input");
+  const messages = document.getElementById("messages");
+  const typing = document.getElementById("typing");
+
+  // =============== 🔥 PERSISTENT SESSION_ID (Required for memory) ===============
+  let sessionId = localStorage.getItem("ms_chat_session");
+  if (!sessionId) {
+    sessionId = "session_" + Math.random().toString(36).slice(2);
+    localStorage.setItem("ms_chat_session", sessionId);
+  }
+
+  function scrollToBottom() {
+    messages.scrollTop = messages.scrollHeight;
+  }
+
+  async function sendMessage() {
+    const userMsg = input.value.trim();
+    if (!userMsg) return;
+
+    messages.insertBefore(createMessageDiv('msg-user', userMsg), typing);
+    input.value = "";
+    scrollToBottom();
+
+    typing.style.display = "block";
+    scrollToBottom();
+
+    try {
+      const res = await fetch("http://localhost:8000/chat", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          message: userMsg,
+          session_id: sessionId   // 🔥 IMPORTANT
+        })
+      });
+
+      const data = await res.json();
+      typing.style.display = "none";
+
+      messages.insertBefore(createMessageDiv('msg-bot', data.response), typing);
+      scrollToBottom();
+
+    } catch (error) {
+      typing.style.display = "none";
+      messages.insertBefore(createMessageDiv('msg-bot', 'Sorry, I encountered an error. Please try again.'), typing);
+      scrollToBottom();
+    }
+  }
+
+  function createMessageDiv(className, text) {
+    const div = document.createElement('div');
+    div.className = className;
+    div.textContent = text;
+    return div;
+  }
+
+  sendBtn.onclick = sendMessage;
+
+  input.addEventListener("keypress", (e) => {
+    if (e.key === "Enter") sendMessage();
+  });
+</script>
+
+</body>
+</html>
